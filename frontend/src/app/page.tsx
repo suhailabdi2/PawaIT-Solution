@@ -1,66 +1,100 @@
-import { Span } from "next/dist/trace";
-import Image from "next/image";
+'use client';
 
+import React, { useState, useEffect } from 'react';
+import { SearchBar } from '../components/SearchBar';
+import { WeatherCard } from '../components/WeatherCard';
+import { ForecastCard } from '../components/ForecastCard';
+import { weatherService } from '../services/weatherService';
+import { CurrentWeatherResponse, ForecastResponse } from '../types/weather';
 
 export default function Home() {
-  
-  const forecasts = [
-    { date: "21 May", icon: "☀️", range: "11‑17 °C" },
-    { date: "22 May", icon: "☁️", range: "20‑24 °C" },
-    { date: "23 May", icon: "☀️", range: "16‑20 °C" },
-  ];
-  return (
-    
-    <div className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/*Left Panel*/}
-        <div className="flex flex-col items-center text-center space-y-4 border-r-2 border-gray-300 pr-4 min-h-screen overflow-x-hidden">
-          <div className="text-7xl">☀️⛅</div>
-          <div className="text-4xl font-bold">13 °C</div>
-          <div className="text-xl text-gray-700">Sunny</div>
-          <div className="text-sm text-gray-500 fixed bottom-0 left-0 p-4">
-            30<sup>th</sup> May 2027 <br /> Nairobi
-          </div>
-        </div>
-        {/*Middle Panel*/}
-        <div className="md:col-span-3 space-y-6">
-          <div className="flex flex-wrap items-center gap-2">
-          <input className="input-block input" placeholder="Search City ..." />
-            <button className="btn btn-primary">GO</button>
-            <button className="btn btn-outline">°C</button>
-            <button className="btn btn-outline">°F</button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {forecasts.map(({ date, icon, range }) => (
-              <div key={date} className="card">
-                <div className="card-body text-center space-y-2">
-                  <h3 className="text-base-content text-sm font-semibold">{date}</h3>
-                  <div className="text-4xl">{icon}</div>
-                  <p className="text-sm">{range}</p>
+    const [currentWeather, setCurrentWeather] = useState<CurrentWeatherResponse | null>(null);
+    const [forecast, setForecast] = useState<ForecastResponse | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [isCelsius, setIsCelsius] = useState(true);
+
+    const fetchWeatherData = async (city: string) => {
+        setLoading(true);
+        setError(null);
+        try {
+            const [current, forecastData] = await Promise.all([
+                weatherService.getCurrentWeather(city),
+                weatherService.getForecast(city)
+            ]);
+            setCurrentWeather(current);
+            setForecast(forecastData);
+        } catch (err) {
+            setError('Failed to fetch weather data. Please try again.');
+            console.error(err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSearch = (city: string) => {
+        fetchWeatherData(city);
+    };
+
+    const toggleTemperatureUnit = () => {
+        setIsCelsius(!isCelsius);
+    };
+
+    const convertTemperature = (temp: number) => {
+        return isCelsius ? temp : (temp * 9/5) + 32;
+    };
+
+    return (
+        <main className="min-h-screen bg-gradient-to-b from-blue-100 to-blue-300 py-8">
+            <div className="container mx-auto px-4">
+                <h1 className="text-3xl font-bold text-center mb-8">Weather App</h1>
+                
+                <SearchBar onSearch={handleSearch} />
+                
+                <div className="text-center mb-4">
+                    <button
+                        onClick={toggleTemperatureUnit}
+                        className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+                    >
+                        Switch to {isCelsius ? 'Fahrenheit' : 'Celsius'}
+                    </button>
                 </div>
-              </div>
-            ))}
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="card">
-              <div className="card-body space-y-2 text-center">
-                <h3 className="text-base-content text-sm font-semibold">Wind Status</h3>
-                <p className="text-2xl font-bold">3 km/h</p>
-                <p className="text-sm text-gray-500">WSW</p>
-              </div>
+
+                {loading && (
+                    <div className="text-center">
+                        <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                    </div>
+                )}
+
+                {error && (
+                    <div className="text-center text-red-500 mb-4">
+                        {error}
+                    </div>
+                )}
+
+                {currentWeather && (
+                    <div className="mb-8">
+                        <WeatherCard 
+                            weather={currentWeather} 
+                            isCelsius={isCelsius}
+                            convertTemperature={convertTemperature}
+                        />
+                    </div>
+                )}
+
+                {forecast && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {forecast.list.slice(0, 3).map((item, index) => (
+                            <ForecastCard 
+                                key={index} 
+                                forecast={item}
+                                isCelsius={isCelsius}
+                                convertTemperature={convertTemperature}
+                            />
+                        ))}
+                    </div>
+                )}
             </div>
-            <div className="card">
-              <div className="card-body space-y-2">
-                <h3 className="text-base-content text-sm font-semibold text-center">Humidity</h3>
-                <p className="text-2xl font-bold text-center">80 %</p>
-                {/* RippleUI’s progress bar */}
-                <progress className="progress w-full " value={80} max={100} />
-              </div>
-            </div>
-        </div>
-        
-        </div>
-      </div>
-      </div>
-  );
+        </main>
+    );
 }
