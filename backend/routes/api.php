@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\WeatherController;
+use Illuminate\Support\Facades\Log;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,10 +16,26 @@ use App\Http\Controllers\WeatherController;
 |
 */
 
+// Debug route to verify file is loaded
+Route::get('/', function () {
+    Log::info('API root route hit');
+    return response()->json(['message' => 'API routes file is loaded']);
+});
+
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-// Weather API Routes
+// Simple test route
+Route::get('/test', function () {
+    return response()->json(['message' => 'API is working']);
+});
+
+// Weather routes
+Route::get('/weather-test', function () {
+    return response()->json(['message' => 'Weather route is working']);
+});
+
+// Weather controller routes
 Route::get('/weather/current', [WeatherController::class, 'getCurrentWeather']);
 Route::get('/weather/forecast', [WeatherController::class, 'getForecast']); 

@@ -9,8 +9,11 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        console.log('Search submitted for city:', city);
         if (city.trim()) {
             onSearch(city.trim());
+        } else {
+            console.log('Empty city name submitted');
         }
     };
 

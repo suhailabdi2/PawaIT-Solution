@@ -15,24 +15,29 @@ export default function Home() {
     const [isCelsius, setIsCelsius] = useState(true);
 
     const fetchWeatherData = async (city: string) => {
+        console.log('Starting to fetch weather data for:', city);
         setLoading(true);
         setError(null);
         try {
+            console.log('Making API calls for:', city);
             const [current, forecastData] = await Promise.all([
                 weatherService.getCurrentWeather(city),
                 weatherService.getForecast(city)
             ]);
+            console.log('Current weather response:', current);
+            console.log('Forecast response:', forecastData);
             setCurrentWeather(current);
             setForecast(forecastData);
         } catch (err) {
+            console.error('Error fetching weather data:', err);
             setError('Failed to fetch weather data. Please try again.');
-            console.error(err);
         } finally {
             setLoading(false);
         }
     };
 
     const handleSearch = (city: string) => {
+        console.log('Handling search for city:', city);
         fetchWeatherData(city);
     };
 

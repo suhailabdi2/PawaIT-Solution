@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class WeatherController extends Controller
 {
@@ -14,10 +15,12 @@ class WeatherController extends Controller
     public function __construct()
     {
         $this->apiKey = env('OPENWEATHER_API_KEY');
+        Log::info('WeatherController initialized with API key: ' . substr($this->apiKey, 0, 5) . '...');
     }
 
     private function getCoordinates($city)
     {
+        Log::info('Getting coordinates for city: ' . $city);
         $response = Http::get("{$this->geoUrl}/direct", [
             'q' => $city,
             'limit' => 1,
@@ -25,10 +28,12 @@ class WeatherController extends Controller
         ]);
 
         if ($response->failed() || empty($response->json())) {
+            Log::error('Failed to get coordinates for city: ' . $city);
             return null;
         }
 
         $data = $response->json()[0];
+        Log::info('Coordinates found: ' . json_encode($data));
         return [
             'lat' => $data['lat'],
             'lon' => $data['lon']
@@ -37,6 +42,7 @@ class WeatherController extends Controller
 
     public function getCurrentWeather(Request $request)
     {
+        Log::info('Current weather request received for city: ' . $request->query('city', 'London'));
         try {
             $city = $request->query('city', 'London');
             $coordinates = $this->getCoordinates($city);
@@ -56,6 +62,7 @@ class WeatherController extends Controller
             ]);
 
             if ($response->failed()) {
+                Log::error('Weather API error: ' . json_encode($response->json()));
                 return response()->json([
                     'error' => 'Failed to fetch weather data',
                     'message' => $response->json()['message'] ?? 'Unknown error'
@@ -64,6 +71,7 @@ class WeatherController extends Controller
 
             return response()->json($response->json());
         } catch (\Exception $e) {
+            Log::error('Weather controller error: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Server error',
                 'message' => $e->getMessage()
@@ -73,6 +81,7 @@ class WeatherController extends Controller
 
     public function getForecast(Request $request)
     {
+        Log::info('Forecast request received for city: ' . $request->query('city', 'London'));
         try {
             $city = $request->query('city', 'London');
             $coordinates = $this->getCoordinates($city);
@@ -92,6 +101,7 @@ class WeatherController extends Controller
             ]);
 
             if ($response->failed()) {
+                Log::error('Forecast API error: ' . json_encode($response->json()));
                 return response()->json([
                     'error' => 'Failed to fetch forecast data',
                     'message' => $response->json()['message'] ?? 'Unknown error'
@@ -100,6 +110,7 @@ class WeatherController extends Controller
 
             return response()->json($response->json());
         } catch (\Exception $e) {
+            Log::error('Forecast controller error: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Server error',
                 'message' => $e->getMessage()

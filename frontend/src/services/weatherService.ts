@@ -1,12 +1,24 @@
 import { CurrentWeatherResponse, ForecastResponse } from '../types/weather';
 
-const API_BASE_URL = 'http://localhost:8000';
+const API_BASE_URL = 'http://localhost:8000/api';
+
+const fetchOptions = {
+    method: 'GET',
+    headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+    },
+    mode: 'cors' as const,
+};
 
 export const weatherService = {
     async getCurrentWeather(city: string): Promise<CurrentWeatherResponse> {
         try {
             console.log('Fetching weather for:', city);
-            const response = await fetch(`${API_BASE_URL}/weather/current?city=${encodeURIComponent(city)}`);
+            const response = await fetch(
+                `${API_BASE_URL}/weather/current?city=${encodeURIComponent(city)}`,
+                fetchOptions
+            );
             
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
@@ -28,7 +40,10 @@ export const weatherService = {
     async getForecast(city: string): Promise<ForecastResponse> {
         try {
             console.log('Fetching forecast for:', city);
-            const response = await fetch(`${API_BASE_URL}/weather/forecast?city=${encodeURIComponent(city)}`);
+            const response = await fetch(
+                `${API_BASE_URL}/weather/forecast?city=${encodeURIComponent(city)}`,
+                fetchOptions
+            );
             
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
