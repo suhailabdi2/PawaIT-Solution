@@ -9,27 +9,24 @@ export const SearchBar: React.FC<SearchBarProps> = ({ onSearch }) => {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Search submitted for city:', city);
         if (city.trim()) {
             onSearch(city.trim());
-        } else {
-            console.log('Empty city name submitted');
         }
     };
 
     return (
-        <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto mb-6">
+        <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto mb-8">
             <div className="relative">
                 <input
                     type="text"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="Enter city name..."
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-6 py-4 text-lg bg-white/10 backdrop-blur-sm border-2 border-blue-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-white placeholder-blue-200"
                 />
                 <button
                     type="submit"
-                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-4 py-1 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-blue-500 text-white px-6 py-2 rounded-xl hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-200"
                 >
                     Search
                 </button>
