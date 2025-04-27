@@ -17,15 +17,15 @@ A modern web application built with Laravel and Next.js, providing a robust full
 ### Frontend
 - **Framework**: Next.js
 - **Language**: TypeScript
-- **Styling**: [Your styling solution - TailwindCSS/CSS Modules/etc.]
-- **Package Manager**: npm/yarn/pnpm
+- **Styling**: TailwindCss
+- **Package Manager**: npm
 
 ## Prerequisites
 
 - PHP 8.2 or higher
 - Composer
 - Node.js (Latest LTS version recommended)
-- npm/yarn/pnpm
+- npm
 - Git
 
 ## Getting Started
@@ -33,7 +33,7 @@ A modern web application built with Laravel and Next.js, providing a robust full
 ### 1. Clone the Repository
 
 ```bash
-git clone [your-repository-url]
+git clone https://github.com/suhailabdi2/PawaIT-Solution
 cd PawaIT-Solution
 ```
 
@@ -70,17 +70,11 @@ cd frontend
 
 # Install dependencies
 npm install
-# or
-yarn install
-# or
-pnpm install
+
 
 # Start the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+
 ```
 
 The frontend application will be running at `http://localhost:3000`
@@ -110,10 +104,8 @@ composer test
 ```bash
 cd frontend
 npm run test
-# or
-yarn test
-# or
-pnpm test
+
+
 ```
 
 ## Project Structure
